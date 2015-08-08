@@ -11,7 +11,9 @@ module.exports = function(grunt) {
       dist: {
         files: [
           {expand: true, dest: 'dist/', cwd: 'src/', src: 'popup.html'},
-          {expand: true, dest: 'dist/', cwd: 'src/', src: 'style_blocks.js'}
+          {expand: true, dest: 'dist/', cwd: 'src/', src: 'style_blocks.js'},
+          {expand: true, dest: 'dist/', cwd: 'src/', src: 'rule_identifiers.js'},
+          {expand: true, dest: 'dist/', cwd: 'src/', src: 'rule_registry.js'}
         ]
       }
     }
@@ -64,7 +66,7 @@ module.exports = function(grunt) {
       contentScriptConfigs.push({
         matches: config.matches,
         run_at: 'document_start',
-        js: ['style_blocks.js', contentScriptPath]
+        js: ['rule_identifiers.js', 'style_blocks.js', contentScriptPath]
       });
 
       grunt.file.write('dist/' + contentScriptPath, contentScript);

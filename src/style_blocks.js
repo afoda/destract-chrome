@@ -1,21 +1,35 @@
-function styleBlockId(ruleSetId, ruleId) {
-   return "destract" + "-" + ruleSetId + "-" + ruleId;
+chrome.runtime.onMessage.addListener(function(request) {
+
+  if (request.action == "set_styleblock_state") {
+    var blockId = getRuleIdentifier(request.ruleSetId, request.ruleId);
+
+    if (request.state && document.getElementById(blockId) == null) {
+      addStyleBlock(blockId, request.rule);
+    }
+    else {
+      removeStyleBlock(blockId);
+    }
+  }
+});
+
+function addStyleBlock(blockId, rule) {
+  var styleBlock = document.createElement('style');
+  styleBlock.id = blockId;
+
+  var cssRules = {
+    remove: "display: none;",
+    hide: "visibility: hidden;"
+  };
+  var css = rule.selector + " { " + cssRules[rule.action] + " }\n";
+  styleBlock.appendChild(document.createTextNode(css));
+
+  document.documentElement.appendChild(styleBlock);
 }
 
-function addStyleBlocks(ruleSetId, ruleSet) {
-  for (var ruleId in ruleSet) {
-    var rule = ruleSet[ruleId];
+function removeStyleBlock(blockId) {
+  var styleBlock = document.getElementById(blockId);
 
-    var styleBlock = document.createElement('style');
-    styleBlock.id = styleBlockId(ruleSetId, ruleId);
-
-    var cssRules = {
-      remove: "display: none;",
-      hide: "visibility: hidden"
-    };
-    var css = rule.selector + " { " + cssRules[rule.action] + " }\n";
-    styleBlock.appendChild(document.createTextNode(css));
-
-    document.documentElement.appendChild(styleBlock);
+  if (styleBlock != null) {
+    styleBlock.parentNode.removeChild(styleBlock);
   }
 }

@@ -10,6 +10,12 @@
   },
 
   "permissions": [
-    "<all_urls>"
+    "<all_urls>",
+    "storage"
   ],
+
+  "background": {
+    "scripts": ["rule_registry.js"],
+    "persistent": false
+  }
 }
