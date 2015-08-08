@@ -10,7 +10,7 @@ module.exports = function(grunt) {
     copy: {
       dist: {
         files: [
-          {expand: true, dest: 'dist/', cwd: 'src/', src: 'popup.html'},
+          {expand: true, dest: 'dist/', cwd: 'src/popup/', src: '*'},
           {expand: true, dest: 'dist/', cwd: 'src/', src: 'style_blocks.js'},
           {expand: true, dest: 'dist/', cwd: 'src/', src: 'rule_identifiers.js'},
           {expand: true, dest: 'dist/', cwd: 'src/', src: 'rule_registry.js'}
