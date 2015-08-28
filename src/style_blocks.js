@@ -1,10 +1,10 @@
 chrome.runtime.onMessage.addListener(function(request) {
-
   if (request.action == "set_styleblock_state") {
     var blockId = getRuleIdentifier(request.ruleSetId, request.ruleId);
 
-    if (request.state && document.getElementById(blockId) == null) {
-      addStyleBlock(blockId, request.rule);
+    if (request.state) {
+      if (document.getElementById(blockId) == null)
+        addStyleBlock(blockId, request.rule);
     }
     else {
       removeStyleBlock(blockId);
