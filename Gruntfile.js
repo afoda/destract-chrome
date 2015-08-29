@@ -11,16 +11,16 @@ module.exports = function(grunt) {
       dist: {
         files: [
           {expand: true, dest: 'dist/', cwd: 'src/popup/', src: '*'},
+          {expand: true, dest: 'dist/', cwd: 'src/', src: 'manifest.json'},
           {expand: true, dest: 'dist/', cwd: 'src/', src: 'style_blocks.js'},
-          {expand: true, dest: 'dist/', cwd: 'src/', src: 'rule_identifiers.js'},
-          {expand: true, dest: 'dist/', cwd: 'src/', src: 'rule_registry.js'}
+          {expand: true, dest: 'dist/', cwd: 'temp/', src: 'rule_registry.js'}
         ]
       }
     }
   });
 
 
-  grunt.registerTask('build-content-scripts', 'Create content scripts from rule files', function() {
+  grunt.registerTask('build-rule-registry', 'Create rule registry from rule files', function() {
 
     function generateRuleId(description) {
       return description
@@ -37,59 +37,38 @@ module.exports = function(grunt) {
       return ruleSetId;
     }
 
-    var contentScriptTemplate = grunt.file.read('src/templates/content_script.js');
-    var contentScriptConfigs = [];
+    var ruleSets = {};
 
     grunt.file.recurse('rules/', function (abspath, rootdir, subdir, filename) {
       var config = grunt.file.readYAML(abspath);
 
-      var ruleSet = {};
+      var ruleSetId = generateRuleSetId(subdir, filename);
+      var ruleSet = {
+        matches: config.matches,
+        rules: {}
+      };
       for (var i = 0; i < config.rules.length; i++) {
         var rule = config.rules[i];
         var ruleId = generateRuleId(rule.description);
-        if (ruleId in ruleSet)
+        if (ruleId in ruleSet.rules)
           throw grunt.util.error("Duplicate rule ids: '" + ruleId + "' (" + abspath + ")");
-        ruleSet[ruleId] = rule;
+        ruleSet.rules[ruleId] = rule;
       }
 
-      var templateData = {
-        ruleSetId: generateRuleSetId(subdir, filename),
-        ruleSet: JSON.stringify(ruleSet, null, 2)
-      }
-
-      var contentScript = grunt.template.process(contentScriptTemplate, {data: templateData});
-      var contentScriptPath =
-        "content_scripts/"
-        + (subdir ? subdir + "/" : "")
-        + filename.replace(/\.[^/.]+$/, ".js");
-
-      contentScriptConfigs.push({
-        matches: config.matches,
-        run_at: 'document_start',
-        js: ['rule_identifiers.js', 'style_blocks.js', contentScriptPath]
-      });
-
-      grunt.file.write('dist/' + contentScriptPath, contentScript);
+      ruleSets[ruleSetId] = ruleSet;
     });
 
-    grunt.file.write('temp/manifest_contentscripts.json', JSON.stringify(contentScriptConfigs));
-  });
+    var ruleRegistryTemplate = grunt.file.read('src/templates/rule_registry.js');
+    var templateData = {ruleSets: JSON.stringify(ruleSets)};
+    var ruleRegistry = grunt.template.process(ruleRegistryTemplate, {data: templateData});
 
-  grunt.registerTask('build-manifest', 'Create manifest.json with content scripts', function () {
-    var manifest = grunt.file.readJSON('src/manifest.json');
-
-    var contentScripts = grunt.file.readJSON('temp/manifest_contentscripts.json');
-    manifest.content_scripts = contentScripts;
-
-    var manifestJson = JSON.stringify(manifest, null, 2);
-    grunt.file.write('dist/manifest.json', manifestJson);
+    grunt.file.write('temp/rule_registry.js', ruleRegistry);
   });
 
 
   grunt.registerTask('build', [
     'clean:dist',
-    'build-content-scripts',
-    'build-manifest',
+    'build-rule-registry',
     'copy:dist',
     'clean:temp'
   ]);
