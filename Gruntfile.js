@@ -39,7 +39,7 @@ module.exports = function(grunt) {
 
     var ruleSets = {};
 
-    grunt.file.recurse('rules/', function (abspath, rootdir, subdir, filename) {
+    grunt.file.recurse('rules/rules/', function (abspath, rootdir, subdir, filename) {
       var config = grunt.file.readYAML(abspath);
 
       var ruleSetId = generateRuleSetId(subdir, filename);
