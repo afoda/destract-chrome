@@ -1,3 +1,6 @@
+var defaultAction = "remove"
+
+
 // Basic add/remove for styleblocks
 
 function addStyleBlock(blockId, rule) {
@@ -8,7 +11,8 @@ function addStyleBlock(blockId, rule) {
     remove: "display: none;",
     hide: "visibility: hidden;"
   };
-  var css = rule.selector + " { " + cssRules[rule.action] + " }\n";
+  var action = rule.action ? rule.action : defaultAction
+  var css = rule.selector + " { " + cssRules[action] + " }\n";
   styleBlock.appendChild(document.createTextNode(css));
 
   document.documentElement.appendChild(styleBlock);
