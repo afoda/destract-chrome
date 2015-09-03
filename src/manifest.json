@@ -5,8 +5,17 @@
   "description": "Removes distracting elements from web pages",
   "version": "0.0",
 
+  "icons": {
+     "128": "images/icon128.png",
+      "48": "images/icon96.png"
+  },
+
   "browser_action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+        "38": "images/icon96.png",
+        "19": "images/icon96.png"
+    }
   },
 
   "permissions": [

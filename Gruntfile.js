@@ -13,7 +13,8 @@ module.exports = function(grunt) {
           {expand: true, dest: 'dist/', cwd: 'src/popup/', src: '*'},
           {expand: true, dest: 'dist/', cwd: 'src/', src: 'manifest.json'},
           {expand: true, dest: 'dist/', cwd: 'src/', src: 'style_blocks.js'},
-          {expand: true, dest: 'dist/', cwd: 'temp/', src: 'rule_registry.js'}
+          {expand: true, dest: 'dist/', cwd: 'temp/', src: 'rule_registry.js'},
+          {expand: true, dest: 'dist/images/', cwd: 'icons/', src: '*'}
         ]
       }
     }
