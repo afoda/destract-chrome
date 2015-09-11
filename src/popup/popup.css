@@ -1,0 +1,25 @@
+body {
+  width: 20em;
+}
+
+#rule-table {
+  display: none;
+}
+
+#rule-table td {
+  padding: 0.6em;
+}
+
+#rule-table td.checkbox-column {
+  width: 1em;
+}
+
+#rule-table td.rulename-column {
+  text-align: left;
+}
+
+#no-rules-placeholder {
+  text-align: center;
+  font-style: italic;
+  color: #AAA;
+}
