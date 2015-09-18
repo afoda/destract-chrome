@@ -43,8 +43,9 @@ function createCheckboxAdder(ruleSetId, ruleId, rule, ruleRow) {
 
     var ruleNameCell = ruleRow.insertCell();
     ruleNameCell.classList.add("rulename-column");
-    var ruleNameText = document.createTextNode(rule.description);
-    ruleNameCell.appendChild(ruleNameText);
+    var ruleNameText = rule.description + " (" + rule.elementCount + ")";
+    var ruleNameTextNode = document.createTextNode(ruleNameText);
+    ruleNameCell.appendChild(ruleNameTextNode);
 
     checkbox.checked = !state;
   }
@@ -52,31 +53,27 @@ function createCheckboxAdder(ruleSetId, ruleId, rule, ruleRow) {
 
 document.addEventListener('DOMContentLoaded', function () {
 
-  chrome.tabs.query({'active': true, 'currentWindow': true}, function(tabArray) {
-    var activeTab = tabArray[0];
-    var parser = document.createElement('a');
-    parser.href = activeTab.url;
+  chrome.tabs.query({'active': true, 'currentWindow': true}, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {action: "get_rule_usage"}, function(ruleUsage) {
+      var ruleTable = document.getElementById("rule-table");
+      var ruleTableBody = ruleTable.getElementsByTagName("tbody")[0];
 
-    var ruleSets = matchingRuleSets(parser.hostname)
+      for (var ruleSetId in ruleUsage) {
+        ruleSet = ruleUsage[ruleSetId];
 
-    var ruleTable = document.getElementById("rule-table");
-    var ruleTableBody = ruleTable.getElementsByTagName("tbody")[0];
+        for (var ruleId in ruleSet) {
+          // Remove placeholder for when no rules exist and show rule table
+          document.getElementById("no-rules-placeholder").style.display = "none";
+          document.getElementById("rule-table").style.display = "block";
 
-    for (var ruleSetId in ruleSets) {
-      ruleSet = ruleSets[ruleSetId];
+          var rule = ruleSet[ruleId];
+          var ruleRow = ruleTableBody.insertRow(-1);
+          var ruleIdentifier = getRuleIdentifier(ruleSetId, ruleId);
 
-      for (var ruleId in ruleSet) {
-        // Remove placeholder for when no rules exist and show rule table
-        document.getElementById("no-rules-placeholder").style.display = "none";
-        document.getElementById("rule-table").style.display = "block";
-
-        var rule = ruleSet[ruleId];
-        var ruleRow = ruleTableBody.insertRow(-1);
-        var ruleIdentifier = getRuleIdentifier(ruleSetId, ruleId);
-
-        var checkboxAdder = createCheckboxAdder(ruleSetId, ruleId, rule, ruleRow);
-        chrome.storage.sync.get(ruleIdentifier, checkboxAdder);
+          var checkboxAdder = createCheckboxAdder(ruleSetId, ruleId, rule, ruleRow);
+          chrome.storage.sync.get(ruleIdentifier, checkboxAdder);
+        }
       }
-    }
+    });
   });
 });
