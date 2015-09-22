@@ -8,46 +8,38 @@ function messageAllTabs(message) {
 
 function createCheckboxAdder(ruleSetId, ruleId, rule, ruleRow) {
 
-  function createRuleToggle(state) {
-    var checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = state;
+  var checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
 
-    checkbox.addEventListener('change', function() {
-      var setter = {};
-      var ruleIdentifier = getRuleIdentifier(ruleSetId, ruleId);
-      setter[ruleIdentifier] = !checkbox.checked;
+  checkbox.addEventListener('change', function() {
+    var setter = {};
+    var ruleIdentifier = getRuleIdentifier(ruleSetId, ruleId);
+    setter[ruleIdentifier] = !checkbox.checked;
 
-      chrome.storage.sync.set(setter, function () {
-        var message = {
-          action: "refresh_styleblock_states"
-        };
-        messageAllTabs(message);
-      });
+    chrome.storage.sync.set(setter, function () {
+      var message = {
+        action: "refresh_styleblock_states"
+      };
+      messageAllTabs(message);
     });
-
-    return checkbox;
-  }
+  });
 
   return function (result) {
     var checkboxCell = ruleRow.insertCell();
     checkboxCell.classList.add("checkbox-column");
+    checkboxCell.appendChild(checkbox);
 
     var ruleIdentifier = getRuleIdentifier(ruleSetId, ruleId);
     var state = rule.default != "disabled";
     if (ruleIdentifier in result)
       state = result[ruleIdentifier];
-
-    var checkbox = createRuleToggle(state);
-    checkboxCell.appendChild(checkbox);
+    checkbox.checked = !state;
 
     var ruleNameCell = ruleRow.insertCell();
     ruleNameCell.classList.add("rulename-column");
     var ruleNameText = rule.description + " (" + rule.elementCount + ")";
     var ruleNameTextNode = document.createTextNode(ruleNameText);
     ruleNameCell.appendChild(ruleNameTextNode);
-
-    checkbox.checked = !state;
   }
 };
 
