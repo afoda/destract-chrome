@@ -36,7 +36,7 @@ function createCheckboxAdder(tracedRule, ruleRow) {
 
     var ruleNameCell = ruleRow.insertCell();
     ruleNameCell.classList.add("rulename-column");
-    var ruleNameText = tracedRule.rule.description + " (" + tracedRule.rule.elementCount + ")";
+    var ruleNameText = tracedRule.rule.description;
     var ruleNameTextNode = document.createTextNode(ruleNameText);
     ruleNameCell.appendChild(ruleNameTextNode);
   }
