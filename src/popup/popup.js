@@ -59,9 +59,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       }
 
-      var usedRules   = tracedRules.filter(function(tr) { return tr.rule.elementCount  > 0; });
-      var unusedRules = tracedRules.filter(function(tr) { return tr.rule.elementCount == 0; });
-
       var compareDescriptions = function (r1, r2) {
           if (r1.rule.description < r2.rule.description)
             return -1;
@@ -69,19 +66,16 @@ document.addEventListener('DOMContentLoaded', function () {
             return 1;
           return 0;
       }
-      usedRules.sort(compareDescriptions);
-      unusedRules.sort(compareDescriptions);
+      tracedRules.sort(compareDescriptions);
 
-      var orderedRules = usedRules.concat(unusedRules);
-
-      if (orderedRules.length > 0) {
+      if (tracedRules.length > 0) {
         document.getElementById("no-rules-placeholder").style.display = "none";
         document.getElementById("rule-table").style.display = "block";
 
         var ruleTableBody = document.querySelector("#rule-table tbody");
 
-        for (var i = 0; i < orderedRules.length; i++) {
-          var tracedRule = orderedRules[i];
+        for (var i = 0; i < tracedRules.length; i++) {
+          var tracedRule = tracedRules[i];
           var ruleIdentifier = getRuleIdentifier(tracedRule.ruleSetId, tracedRule.ruleId);
 
           var ruleRow = ruleTableBody.insertRow(-1);
