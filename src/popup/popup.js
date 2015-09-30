@@ -85,6 +85,9 @@ document.addEventListener('DOMContentLoaded', function () {
           var ruleIdentifier = getRuleIdentifier(tracedRule.ruleSetId, tracedRule.ruleId);
 
           var ruleRow = ruleTableBody.insertRow(-1);
+          if (tracedRule.rule.elementCount == 0)
+              ruleRow.classList.add("unused-rule");
+
           var checkboxAdder = createCheckboxAdder(tracedRule, ruleRow);
           chrome.storage.sync.get(ruleIdentifier, checkboxAdder);
         }
