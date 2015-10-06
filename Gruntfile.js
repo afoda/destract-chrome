@@ -38,7 +38,7 @@ module.exports = function(grunt) {
       return ruleSetId;
     }
 
-    var ruleSets = {};
+    var ruleRegistry = {};
 
     grunt.file.recurse('rules/rules/', function (abspath, rootdir, subdir, filename) {
       var config = grunt.file.readYAML(abspath);
@@ -56,11 +56,11 @@ module.exports = function(grunt) {
         ruleSet.rules[ruleId] = rule;
       }
 
-      ruleSets[ruleSetId] = ruleSet;
+      ruleRegistry[ruleSetId] = ruleSet;
     });
 
     var ruleRegistryTemplate = grunt.file.read('src/templates/rule_registry.js');
-    var templateData = {ruleSets: JSON.stringify(ruleSets)};
+    var templateData = {ruleRegistry: JSON.stringify(ruleRegistry)};
     var ruleRegistry = grunt.template.process(ruleRegistryTemplate, {data: templateData});
 
     grunt.file.write('temp/rule_registry.js', ruleRegistry);

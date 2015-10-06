@@ -7,7 +7,7 @@
 
   "icons": {
      "128": "images/icon128.png",
-      "48": "images/icon96.png"
+      "48": "images/icon128.png"
   },
 
   "browser_action": {

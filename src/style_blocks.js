@@ -75,9 +75,20 @@ function refreshStyleBlockStates() {
   }
 }
 
-chrome.runtime.onMessage.addListener(function(request) {
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.action == "refresh_styleblock_states") {
     refreshStyleBlockStates();
+  }
+  else if (request.action == "get_rule_usage") {
+    // Update ruleSets with current usage information
+    for (var ruleSetId in ruleSets) {
+      var ruleSet = ruleSets[ruleSetId];
+      for (ruleId in ruleSet) {
+        var rule = ruleSet[ruleId];
+        rule.elementCount = document.querySelectorAll(rule.selector).length;
+      }
+    }
+    sendResponse(ruleSets);
   }
 });
 

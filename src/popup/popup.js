@@ -6,77 +6,86 @@ function messageAllTabs(message) {
   });
 }
 
-function createCheckboxAdder(ruleSetId, ruleId, rule, ruleRow) {
+function createCheckboxAdder(tracedRule, ruleRow) {
+  var ruleIdentifier = getRuleIdentifier(tracedRule.ruleSetId, tracedRule.ruleId);
 
-  function createRuleToggle(state) {
-    var checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = state;
+  var checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
 
-    checkbox.addEventListener('change', function() {
-      var setter = {};
-      var ruleIdentifier = getRuleIdentifier(ruleSetId, ruleId);
-      setter[ruleIdentifier] = !checkbox.checked;
+  checkbox.addEventListener('change', function() {
+    var setter = {};
+    setter[ruleIdentifier] = !checkbox.checked;
 
-      chrome.storage.sync.set(setter, function () {
-        var message = {
-          action: "refresh_styleblock_states"
-        };
-        messageAllTabs(message);
-      });
+    chrome.storage.sync.set(setter, function () {
+      var message = {
+        action: "refresh_styleblock_states"
+      };
+      messageAllTabs(message);
     });
-
-    return checkbox;
-  }
+  });
 
   return function (result) {
     var checkboxCell = ruleRow.insertCell();
     checkboxCell.classList.add("checkbox-column");
+    checkboxCell.appendChild(checkbox);
 
-    var ruleIdentifier = getRuleIdentifier(ruleSetId, ruleId);
-    var state = rule.default != "disabled";
+    var state = tracedRule.rule.default != "disabled";
     if (ruleIdentifier in result)
       state = result[ruleIdentifier];
-
-    var checkbox = createRuleToggle(state);
-    checkboxCell.appendChild(checkbox);
+    checkbox.checked = !state;
 
     var ruleNameCell = ruleRow.insertCell();
     ruleNameCell.classList.add("rulename-column");
-    var ruleNameText = document.createTextNode(rule.description);
-    ruleNameCell.appendChild(ruleNameText);
-
-    checkbox.checked = !state;
+    var ruleNameText = tracedRule.rule.description;
+    var ruleNameTextNode = document.createTextNode(ruleNameText);
+    ruleNameCell.appendChild(ruleNameTextNode);
   }
 };
 
 document.addEventListener('DOMContentLoaded', function () {
 
-  chrome.tabs.query({'active': true, 'currentWindow': true}, function(tabArray) {
-    var activeTab = tabArray[0];
-    var parser = document.createElement('a');
-    parser.href = activeTab.url;
+  chrome.tabs.query({'active': true, 'currentWindow': true}, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {action: "get_rule_usage"}, function(ruleUsage) {
 
-    var ruleSets = matchingRuleSets(parser.hostname)
+      var tracedRules = [];
+      for (var ruleSetId in ruleUsage) {
+        ruleSet = ruleUsage[ruleSetId];
+        for (var ruleId in ruleSet) {
+          tracedRules.push({
+            ruleSetId : ruleSetId,
+            ruleId    : ruleId,
+            rule      : ruleSet[ruleId]
+          });
+        }
+      }
 
-    var ruleTable = document.getElementById("rule-table");
-    var ruleTableBody = ruleTable.getElementsByTagName("tbody")[0];
+      var compareDescriptions = function (r1, r2) {
+          if (r1.rule.description < r2.rule.description)
+            return -1;
+          if (r1.rule.description > r2.rule.description)
+            return 1;
+          return 0;
+      }
+      tracedRules.sort(compareDescriptions);
 
-    for (var ruleSetId in ruleSets) {
-      ruleSet = ruleSets[ruleSetId];
-
-      for (var ruleId in ruleSet) {
-        // Remove placeholder for when no rules exist and show rule table
+      if (tracedRules.length > 0) {
         document.getElementById("no-rules-placeholder").style.display = "none";
         document.getElementById("rule-table").style.display = "block";
 
-        var rule = ruleSet[ruleId];
-        var ruleRow = ruleTableBody.insertRow(-1);
-        var ruleIdentifier = getRuleIdentifier(ruleSetId, ruleId);
+        var ruleTableBody = document.querySelector("#rule-table tbody");
 
-        var checkboxAdder = createCheckboxAdder(ruleSetId, ruleId, rule, ruleRow);
-        chrome.storage.sync.get(ruleIdentifier, checkboxAdder);
+        for (var i = 0; i < tracedRules.length; i++) {
+          var tracedRule = tracedRules[i];
+          var ruleIdentifier = getRuleIdentifier(tracedRule.ruleSetId, tracedRule.ruleId);
+
+          var ruleRow = ruleTableBody.insertRow(-1);
+          if (tracedRule.rule.elementCount == 0)
+              ruleRow.classList.add("unused-rule");
+
+          var checkboxAdder = createCheckboxAdder(tracedRule, ruleRow);
+          chrome.storage.sync.get(ruleIdentifier, checkboxAdder);
+        }
       }
-    }
+    });
   });
 });

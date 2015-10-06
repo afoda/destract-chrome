@@ -1,4 +1,4 @@
-var ruleSets = <%= ruleSets %>;
+var ruleRegistry = <%= ruleRegistry %>;
 
 
 function getRuleIdentifier(ruleSetId, ruleId) {
@@ -11,8 +11,8 @@ function endsWith(str, suffix) {
 
 function matchingRuleSets(hostname) {
   var matches = {};
-  for (var ruleSetId in ruleSets) {
-    var ruleSet = ruleSets[ruleSetId];
+  for (var ruleSetId in ruleRegistry) {
+    var ruleSet = ruleRegistry[ruleSetId];
 
     var match = false;
     var matchHosts = ruleSet.matches;
