@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
 
-  "name": "Destract",
-  "description": "Removes distracting elements from web pages",
+  "name": "destract",
+  "description": "Blocks distracting elements on web pages",
   "version": "0.2",
 
   "icons": {
