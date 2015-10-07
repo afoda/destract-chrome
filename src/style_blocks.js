@@ -75,6 +75,11 @@ function refreshStyleBlockStates() {
   }
 }
 
+refreshStyleBlockStates();
+
+
+// Messages supported by each tab
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.action == "refresh_styleblock_states") {
     refreshStyleBlockStates();
@@ -91,5 +96,3 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     sendResponse(ruleSets);
   }
 });
-
-refreshStyleBlockStates();
