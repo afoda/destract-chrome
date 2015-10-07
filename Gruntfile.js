@@ -17,6 +17,16 @@ module.exports = function(grunt) {
           {expand: true, dest: 'dist/images/', cwd: 'icons/', src: '*'}
         ]
       }
+    },
+    compress: {
+      dist: {
+        options: {
+          archive: 'dist/destract.zip'
+        },
+        expand: true,
+        cwd: 'dist/',
+        src: '**/*'
+      }
     }
   });
 
@@ -71,6 +81,7 @@ module.exports = function(grunt) {
     'clean:dist',
     'build-rule-registry',
     'copy:dist',
+    'compress:dist',
     'clean:temp'
   ]);
 
