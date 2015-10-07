@@ -3,7 +3,7 @@
 
   "name": "destract",
   "description": "Blocks distracting elements on web pages",
-  "version": "0.2",
+  "version": "0.2.1",
 
   "icons": {
      "128": "images/icon128.png",
